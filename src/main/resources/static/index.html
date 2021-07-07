@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fake WooTalk</title>
+
+    <style>
+        .hide {
+            display: none;
+        }
+        .show {
+            display: block;
+        }
+        #mes_left{
+            float: left;
+        }
+        #mes_right{
+            float: right;
+            width: 50%;
+            text-align: right;
+        }
+    </style>
+
+</head>
+<body>
+
+<h2>Fake WooTalk</h2>
+
+<button id="start">開始聊天</button>
+
+<div id="chatArea" class="hide">
+    <p id="greeting">找個人聊天...</p>
+    <p id="test"></p>
+
+    <div id="content">
+
+    </div>
+
+    <div id="input">
+        <button id="exit">離開</button>
+        <input type="text" id="input_text">
+        <button id="submit">送出</button>
+    </div>
+</div>
+
+
+<script src="js/jquery.js"></script>
+<script src="js/index.js"></script>
+
+</body>
+</html>
