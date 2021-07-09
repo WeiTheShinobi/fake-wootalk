@@ -1,9 +1,12 @@
 package com.weitheshinobi.fakewootalk.websocket.service;
 
 import com.weitheshinobi.fakewootalk.websocket.pojo.ChatRoom;
+import org.springframework.stereotype.Component;
 
+import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Queue;
 
 
@@ -22,7 +25,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public void onOpen(Queue chatRoomQueue, Session session) throws IOException {
+    public void onOpen(Queue chatRoomQueue, Session session, EndpointConfig config) throws IOException {
         this.session = session;
 
         if (chatRoomQueue.size() == 0) {
@@ -33,6 +36,7 @@ public class ChatServiceImpl implements ChatService {
             myChatRoom = (ChatRoom) chatRoomQueue.poll();
             if (myChatRoom.getUserSession1().isOpen()){
                 myChatRoom.setUserSession2(session);
+
                 myChatRoom.getUserSession1().getBasicRemote().sendText(SYSTEM_MESSAGE_START_CHAT);
                 session.getBasicRemote().sendText(SYSTEM_MESSAGE_START_CHAT);
             } else {
@@ -40,6 +44,11 @@ public class ChatServiceImpl implements ChatService {
                 session.close();
             }
         }
+
+    }
+
+    @Override
+    public void onOpen(Map chatRoomMap, String secret, Session session, EndpointConfig config) throws IOException {
 
     }
 

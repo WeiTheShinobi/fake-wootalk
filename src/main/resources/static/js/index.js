@@ -1,7 +1,6 @@
-
 function showAndHide() {
     $('#chatArea').toggleClass('show');
-    $('#start').toggleClass('hide')
+    $('#startArea').toggleClass('hide')
 }
 
 function webSocket() {
@@ -12,7 +11,7 @@ function webSocket() {
     let isOpen = true;
 
     ws.onmessage = function (ev) {
-        let receiveStr = "<span id='mes_left'>"+ ev.data +"</span></br>";
+        let receiveStr = "<span id='mes_left'>" + ev.data + "</span></br>";
         $("#content").append(receiveStr);
     };
 
@@ -23,7 +22,7 @@ function webSocket() {
     $("#submit").click(function () {
         if (isOpen) {
             ws.send($("#input_text").val());
-            let sendStr = "<span id='mes_right'>"+ $("#input_text").val() +"</span></br>";
+            let sendStr = "<span id='mes_right'>" + $("#input_text").val() + "</span></br>";
             $("#content").append(sendStr);
             $("#input_text").val("");
         }
@@ -36,5 +35,16 @@ function webSocket() {
 }
 
 $("#start").click(function () {
-    webSocket()
+    $.ajax({
+        url: "/sendSecret",
+        data: {"secret": $('#input_Secret').val()},
+        type: "POST",
+        dataType: "text",
+        cache: false,
+        async: false,
+        success: function () {
+            $('#input_Secret').val("")
+        }
+    });
+    webSocket();
 });

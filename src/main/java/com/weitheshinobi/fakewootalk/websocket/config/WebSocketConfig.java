@@ -1,4 +1,4 @@
-package com.weitheshinobi.fakewootalk.config;
+package com.weitheshinobi.fakewootalk.websocket.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
