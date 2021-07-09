@@ -1,7 +1,6 @@
 package com.weitheshinobi.fakewootalk.websocket.service;
 
 import com.weitheshinobi.fakewootalk.websocket.pojo.ChatRoom;
-import org.springframework.stereotype.Component;
 
 import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
@@ -17,7 +16,7 @@ public class ChatServiceImpl implements ChatService {
     private static final String SYSTEM_MESSAGE_SEARCHING = "系統訊息：正在幫您配對中…";
 
     private Session session;
-    private ChatRoom myChatRoom;
+    private ChatRoom mChatRoom;
     private Session anotherUser;
 
     public static ChatServiceImpl getInstance() {
@@ -29,15 +28,15 @@ public class ChatServiceImpl implements ChatService {
         this.session = session;
 
         if (chatRoomQueue.size() == 0) {
-            myChatRoom = ChatRoom.getInstance(session);
-            chatRoomQueue.add(myChatRoom);
+            mChatRoom = ChatRoom.getInstance(session);
+            chatRoomQueue.add(mChatRoom);
         } else {
 //            拿到聊天室時，可能user1已經離開了，此時直接關閉(edge case)
-            myChatRoom = (ChatRoom) chatRoomQueue.poll();
-            if (myChatRoom.getUserSession1().isOpen()){
-                myChatRoom.setUserSession2(session);
+            mChatRoom = (ChatRoom) chatRoomQueue.poll();
+            if (mChatRoom.getUserSession1().isOpen()){
+                mChatRoom.setUserSession2(session);
 
-                myChatRoom.getUserSession1().getBasicRemote().sendText(SYSTEM_MESSAGE_START_CHAT);
+                mChatRoom.getUserSession1().getBasicRemote().sendText(SYSTEM_MESSAGE_START_CHAT);
                 session.getBasicRemote().sendText(SYSTEM_MESSAGE_START_CHAT);
             } else {
                 session.getBasicRemote().sendText(SYSTEM_MESSAGE_USER_LEFT);
@@ -54,9 +53,9 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public void onMessage(String message, Session session) throws IOException {
-        boolean isChatRoomFull = myChatRoom.getUserSession1() != null && myChatRoom.getUserSession2() != null;
+        boolean isChatRoomFull = mChatRoom.getUserSession1() != null && mChatRoom.getUserSession2() != null;
         if (isChatRoomFull) {
-            anotherUser = getAnotherUser(myChatRoom);
+            anotherUser = getAnotherUser(mChatRoom);
             anotherUser.getBasicRemote().sendText(message);
         } else {
             session.getBasicRemote().sendText(SYSTEM_MESSAGE_SEARCHING);
@@ -67,7 +66,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public void onClose(Session session) throws IOException {
         if(anotherUser == null){
-            anotherUser = getAnotherUser(myChatRoom);
+            anotherUser = getAnotherUser(mChatRoom);
         }
 
         if (anotherUser != null) {
@@ -77,6 +76,17 @@ public class ChatServiceImpl implements ChatService {
             }
         }
 
+    }
+
+    @Override
+    public void onClose(Session session, Queue queue, Map map) throws IOException {
+        onClose(session);
+        synchronized (queue){
+            if (queue.size() > 0){
+                ChatRoom chatRoom = (ChatRoom) queue.element();
+                if(chatRoom == mChatRoom) queue.poll();
+            }
+        }
     }
 
     @Override
@@ -92,4 +102,27 @@ public class ChatServiceImpl implements ChatService {
         }
     }
 
+    Session getSession() {
+        return session;
+    }
+
+    void setSession(Session session) {
+        this.session = session;
+    }
+
+    ChatRoom getmChatRoom() {
+        return mChatRoom;
+    }
+
+    void setmChatRoom(ChatRoom mChatRoom) {
+        this.mChatRoom = mChatRoom;
+    }
+
+    Session getAnotherUser() {
+        return anotherUser;
+    }
+
+    void setAnotherUser(Session anotherUser) {
+        this.anotherUser = anotherUser;
+    }
 }

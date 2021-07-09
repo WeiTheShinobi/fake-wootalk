@@ -29,8 +29,8 @@ public class ChatEndpoint {
     public void onOpen(Session session, EndpointConfig config) throws IOException {
         String secret = getSecretFromHttpSession(config);
 
-        if (secret != "") {
-            chatService = SecretChatServiceImpl.getInstance();
+        if (secret != null) {
+            chatService = SecretChatServiceImpl.getInstance(ChatServiceImpl.getInstance());
             chatService.onOpen(chatRoomsMap, secret, session, config);
         } else {
             chatService = ChatServiceImpl.getInstance();
@@ -46,12 +46,14 @@ public class ChatEndpoint {
 
     @OnClose
     public void onClose(Session session) throws IOException {
-        chatService.onClose(session);
+        chatService.onClose(session, chatRoomsQueue, chatRoomsMap);
     }
 
     private String getSecretFromHttpSession(EndpointConfig config) {
         HttpSession httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
-        return (String)httpSession.getAttribute("secret");
+        String secret = (String) httpSession.getAttribute("secret");
+        httpSession.removeAttribute("secret");
+        return secret;
     }
 
 

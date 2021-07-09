@@ -16,6 +16,9 @@ public interface ChatService {
 
     void onClose(Session session) throws IOException;
 
+//    如果使用者開始後並在配對到前離開的話，這個方法可以移除廢棄的聊天室
+    void onClose(Session session, Queue queue, Map map) throws IOException;
+
     void onError(Session session, Throwable throwable) throws IOException;
 
 }
