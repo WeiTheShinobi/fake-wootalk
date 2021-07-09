@@ -1,4 +1,4 @@
-package com.weitheshinobi.fakewootalk.websocket.service;
+package com.weitheshinobi.fakewootalk.websocket.controller;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;

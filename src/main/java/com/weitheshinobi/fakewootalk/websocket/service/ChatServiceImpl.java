@@ -15,7 +15,7 @@ public class ChatServiceImpl implements ChatService {
     private static final String SYSTEM_MESSAGE_START_CHAT = "開始聊天囉！";
     private static final String SYSTEM_MESSAGE_SEARCHING = "系統訊息：正在幫您配對中…";
 
-    private Session session;
+    private Session mSession;
     private ChatRoom mChatRoom;
     private Session anotherUser;
 
@@ -25,7 +25,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public void onOpen(Queue chatRoomQueue, Session session, EndpointConfig config) throws IOException {
-        this.session = session;
+        this.mSession = session;
 
         if (chatRoomQueue.size() == 0) {
             mChatRoom = ChatRoom.getInstance(session);
@@ -95,19 +95,15 @@ public class ChatServiceImpl implements ChatService {
     }
 
     private Session getAnotherUser(ChatRoom chatRoom) {
-        if (chatRoom.getUserSession1() == session) {
+        if (chatRoom.getUserSession1() == mSession) {
             return chatRoom.getUserSession2();
         } else {
             return chatRoom.getUserSession1();
         }
     }
 
-    Session getSession() {
-        return session;
-    }
-
-    void setSession(Session session) {
-        this.session = session;
+    void setmSession(Session mSession) {
+        this.mSession = mSession;
     }
 
     ChatRoom getmChatRoom() {

@@ -31,7 +31,7 @@ public class SecretChatServiceImpl implements ChatService {
 
     @Override
     public void onOpen(Map chatRoomMap, String secret, Session session, EndpointConfig config) throws IOException {
-        chatService.setSession(session);
+        chatService.setmSession(session);
 
         if (chatRoomMap.get(secret) == null){
             chatService.setmChatRoom(ChatRoom.getInstance(session));

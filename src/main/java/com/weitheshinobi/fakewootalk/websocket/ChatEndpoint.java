@@ -39,6 +39,13 @@ public class ChatEndpoint {
 
     }
 
+    private String getSecretFromHttpSession(EndpointConfig config) {
+        HttpSession httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
+        String secret = (String) httpSession.getAttribute("secret");
+        httpSession.removeAttribute("secret");
+        return secret;
+    }
+
     @OnMessage
     public void onMessage(String message, Session session) throws IOException {
         chatService.onMessage(message, session);
@@ -48,13 +55,5 @@ public class ChatEndpoint {
     public void onClose(Session session) throws IOException {
         chatService.onClose(session, chatRoomsQueue, chatRoomsMap);
     }
-
-    private String getSecretFromHttpSession(EndpointConfig config) {
-        HttpSession httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
-        String secret = (String) httpSession.getAttribute("secret");
-        httpSession.removeAttribute("secret");
-        return secret;
-    }
-
 
 }
