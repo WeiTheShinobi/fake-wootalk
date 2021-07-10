@@ -16,7 +16,7 @@ public class SecretChatService extends AbstractChatService {
     private String mSecret;
 
     @Override
-    public void onOpen(String secret, Session session, EndpointConfig config) throws IOException {
+    public void onOpen(String secret, Session session) throws IOException {
         mSession = session;
         mSecret = secret;
 

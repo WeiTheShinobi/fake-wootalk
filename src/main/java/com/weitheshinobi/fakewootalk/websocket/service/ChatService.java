@@ -14,7 +14,7 @@ public class ChatService extends AbstractChatService {
     protected static Queue<ChatRoom> chatRoomsQueue = new ConcurrentLinkedQueue<>();
 
     @Override
-    public void onOpen(String secret, Session session, EndpointConfig config) throws IOException {
+    public void onOpen(String secret, Session session) throws IOException {
         mSession = session;
 
         if (chatRoomsQueue.size() == 0) {

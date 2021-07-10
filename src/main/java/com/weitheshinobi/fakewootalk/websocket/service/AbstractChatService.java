@@ -16,7 +16,7 @@ public abstract class AbstractChatService {
     protected ChatRoom mChatRoom;
     protected Session anotherUser;
 
-    abstract public void onOpen(String secret, Session session, EndpointConfig config) throws IOException;
+    abstract public void onOpen(String secret, Session session) throws IOException;
 
     public void onMessage(String message, Session session) throws IOException {
         boolean isChatRoomFull = mChatRoom.getUserSession1() != null && mChatRoom.getUserSession2() != null;
