@@ -5,8 +5,6 @@ import com.weitheshinobi.fakewootalk.websocket.pojo.ChatRoom;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Queue;
 
 public abstract class AbstractChatService {
 
@@ -18,7 +16,7 @@ public abstract class AbstractChatService {
     protected ChatRoom mChatRoom;
     protected Session anotherUser;
 
-    abstract public void onOpen(Queue chatRoomQueue, Map chatRoomMap, String secret, Session session, EndpointConfig config) throws IOException;
+    abstract public void onOpen(String secret, Session session, EndpointConfig config) throws IOException;
 
     public void onMessage(String message, Session session) throws IOException {
         boolean isChatRoomFull = mChatRoom.getUserSession1() != null && mChatRoom.getUserSession2() != null;
@@ -30,11 +28,10 @@ public abstract class AbstractChatService {
         }
     }
 
-    protected void onClose(Session session) throws IOException {
+    public void onClose(Session session) throws IOException {
         if(anotherUser == null){
             anotherUser = getAnotherUser(mChatRoom);
         }
-
         if (anotherUser != null) {
             if(anotherUser.isOpen()) {
                 anotherUser.getBasicRemote().sendText(SYSTEM_MESSAGE_USER_LEFT);
@@ -42,8 +39,6 @@ public abstract class AbstractChatService {
             }
         }
     }
-
-    public abstract void onClose(Session session, Queue queue, Map map) throws IOException;
 
     public abstract void onError(Session session, Throwable throwable) throws IOException;
 

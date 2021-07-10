@@ -6,23 +6,26 @@ import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+
 
 public class SecretChatService extends AbstractChatService {
+
+    protected static Map<String, ChatRoom> chatRoomsMap = new ConcurrentHashMap<>();
 
     private String mSecret;
 
     @Override
-    public void onOpen(Queue chatRoomQueue,Map chatRoomMap, String secret, Session session, EndpointConfig config) throws IOException {
+    public void onOpen(String secret, Session session, EndpointConfig config) throws IOException {
         mSession = session;
+        mSecret = secret;
 
-        if (chatRoomMap.get(secret) == null) {
+        if (chatRoomsMap.get(secret) == null) {
             mChatRoom = ChatRoom.getInstance(session);
-            chatRoomMap.put(secret, mChatRoom);
-            mSecret = secret;
+            chatRoomsMap.put(secret, mChatRoom);
         } else {
-            mChatRoom = (ChatRoom) chatRoomMap.get(secret);
-            chatRoomMap.remove(secret);
+            mChatRoom = chatRoomsMap.get(secret);
+            chatRoomsMap.remove(secret);
 
             anotherUser = mChatRoom.getUserSession1();
             if (anotherUser.isOpen()) {
@@ -38,13 +41,9 @@ public class SecretChatService extends AbstractChatService {
     }
 
     @Override
-    public void onClose(Session session, Queue queue, Map map) throws IOException {
-        onClose(session);
-        synchronized (map) {
-            if (map.size() > 0) {
-                if (map.get(mSecret) == mChatRoom) map.remove(mSecret);
-            }
-        }
+    public void onClose(Session session) throws IOException {
+        super.onClose(session);
+        if (chatRoomsMap.get(mSecret) == mChatRoom) chatRoomsMap.remove(mSecret);
     }
 
     @Override

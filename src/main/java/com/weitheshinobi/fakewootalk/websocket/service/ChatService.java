@@ -5,21 +5,23 @@ import com.weitheshinobi.fakewootalk.websocket.pojo.ChatRoom;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 public class ChatService extends AbstractChatService {
 
+    protected static Queue<ChatRoom> chatRoomsQueue = new ConcurrentLinkedQueue<>();
+
     @Override
-    public void onOpen(Queue chatRoomQueue,Map chatRoomMap, String secret, Session session, EndpointConfig config) throws IOException {
+    public void onOpen(String secret, Session session, EndpointConfig config) throws IOException {
         mSession = session;
 
-        if (chatRoomQueue.size() == 0) {
+        if (chatRoomsQueue.size() == 0) {
             mChatRoom = ChatRoom.getInstance(session);
-            chatRoomQueue.add(mChatRoom);
+            chatRoomsQueue.add(mChatRoom);
         } else {
-            mChatRoom = (ChatRoom) chatRoomQueue.poll();
+            mChatRoom = chatRoomsQueue.poll();
             if (mChatRoom.getUserSession1().isOpen()){
                 mChatRoom.setUserSession2(session);
 
@@ -34,13 +36,11 @@ public class ChatService extends AbstractChatService {
     }
 
     @Override
-    public void onClose(Session session, Queue queue, Map map) throws IOException {
+    public void onClose(Session session) throws IOException {
         super.onClose(session);
-        synchronized (queue){
-            if (queue.size() > 0){
-                ChatRoom chatRoom = (ChatRoom) queue.element();
-                if(chatRoom == mChatRoom) queue.poll();
-            }
+        if (chatRoomsQueue.size() > 0) {
+            ChatRoom chatRoom = chatRoomsQueue.element();
+            if(chatRoom == mChatRoom) chatRoomsQueue.poll();
         }
     }
 
