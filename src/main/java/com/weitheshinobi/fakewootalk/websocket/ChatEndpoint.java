@@ -1,10 +1,10 @@
 package com.weitheshinobi.fakewootalk.websocket;
 
 import com.weitheshinobi.fakewootalk.websocket.config.GetHttpSessionConfigurator;
+import com.weitheshinobi.fakewootalk.websocket.service.AbstractChatServiceSimpleFactory;
 import com.weitheshinobi.fakewootalk.websocket.pojo.ChatRoom;
 import com.weitheshinobi.fakewootalk.websocket.service.AbstractChatService;
-import com.weitheshinobi.fakewootalk.websocket.service.ChatService;
-import com.weitheshinobi.fakewootalk.websocket.service.SecretChatService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpSession;
@@ -28,16 +28,8 @@ public class ChatEndpoint {
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) throws IOException {
         String secret = getSecretFromHttpSession(config);
-        chatService = getInstance(secret);
+        chatService = AbstractChatServiceSimpleFactory.createChatService(secret);
         chatService.onOpen(chatRoomsQueue, chatRoomsMap, secret, session, config);
-    }
-
-    private AbstractChatService getInstance(String secret) {
-        if (secret != null) {
-            return new SecretChatService();
-        } else {
-            return new ChatService();
-        }
     }
 
     private String getSecretFromHttpSession(EndpointConfig config) {
