@@ -8,38 +8,41 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Queue;
 
+public class SecretChatService extends AbstractChatService {
 
-public class ChatService extends AbstractChatService {
+    private String mSecret;
 
     @Override
     public void onOpen(Queue chatRoomQueue,Map chatRoomMap, String secret, Session session, EndpointConfig config) throws IOException {
         mSession = session;
 
-        if (chatRoomQueue.size() == 0) {
+        if (chatRoomMap.get(secret) == null) {
             mChatRoom = ChatRoom.getInstance(session);
-            chatRoomQueue.add(mChatRoom);
+            chatRoomMap.put(secret, mChatRoom);
+            mSecret = secret;
         } else {
-            mChatRoom = (ChatRoom) chatRoomQueue.poll();
-            if (mChatRoom.getUserSession1().isOpen()){
-                mChatRoom.setUserSession2(session);
+            mChatRoom = (ChatRoom) chatRoomMap.get(secret);
+            chatRoomMap.remove(secret);
 
+            anotherUser = mChatRoom.getUserSession1();
+            if (anotherUser.isOpen()) {
                 mChatRoom.getUserSession1().getBasicRemote().sendText(SYSTEM_MESSAGE_START_CHAT);
                 session.getBasicRemote().sendText(SYSTEM_MESSAGE_START_CHAT);
+
+                mChatRoom.setUserSession2(session);
             } else {
                 session.getBasicRemote().sendText(SYSTEM_MESSAGE_USER_LEFT);
                 session.close();
             }
         }
-
     }
 
     @Override
     public void onClose(Session session, Queue queue, Map map) throws IOException {
-        super.onClose(session);
-        synchronized (queue){
-            if (queue.size() > 0){
-                ChatRoom chatRoom = (ChatRoom) queue.element();
-                if(chatRoom == mChatRoom) queue.poll();
+        onClose(session);
+        synchronized (map) {
+            if (map.size() > 0) {
+                if (map.get(mSecret) == mChatRoom) map.remove(mSecret);
             }
         }
     }
@@ -48,5 +51,6 @@ public class ChatService extends AbstractChatService {
     public void onError(Session session, Throwable throwable) throws IOException {
 
     }
+
 
 }

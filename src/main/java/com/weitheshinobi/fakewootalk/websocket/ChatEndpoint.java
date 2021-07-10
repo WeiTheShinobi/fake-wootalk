@@ -2,9 +2,9 @@ package com.weitheshinobi.fakewootalk.websocket;
 
 import com.weitheshinobi.fakewootalk.websocket.config.GetHttpSessionConfigurator;
 import com.weitheshinobi.fakewootalk.websocket.pojo.ChatRoom;
+import com.weitheshinobi.fakewootalk.websocket.service.AbstractChatService;
 import com.weitheshinobi.fakewootalk.websocket.service.ChatService;
-import com.weitheshinobi.fakewootalk.websocket.service.ChatServiceImpl;
-import com.weitheshinobi.fakewootalk.websocket.service.SecretChatServiceImpl;
+import com.weitheshinobi.fakewootalk.websocket.service.SecretChatService;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpSession;
@@ -16,27 +16,28 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-@ServerEndpoint(value = "/chat",configurator = GetHttpSessionConfigurator.class)
+@ServerEndpoint(value = "/chat", configurator = GetHttpSessionConfigurator.class)
 @Component
 public class ChatEndpoint {
 
     private static Queue<ChatRoom> chatRoomsQueue = new ConcurrentLinkedQueue<>();
     private static Map<String, ChatRoom> chatRoomsMap = new ConcurrentHashMap<>();
 
-    private ChatService chatService;
+    private AbstractChatService chatService;
 
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) throws IOException {
         String secret = getSecretFromHttpSession(config);
+        chatService = getInstance(secret);
+        chatService.onOpen(chatRoomsQueue, chatRoomsMap, secret, session, config);
+    }
 
+    private AbstractChatService getInstance(String secret) {
         if (secret != null) {
-            chatService = SecretChatServiceImpl.getInstance(ChatServiceImpl.getInstance());
-            chatService.onOpen(chatRoomsMap, secret, session, config);
+            return new SecretChatService();
         } else {
-            chatService = ChatServiceImpl.getInstance();
-            chatService.onOpen(chatRoomsQueue, session, config);
+            return new ChatService();
         }
-
     }
 
     private String getSecretFromHttpSession(EndpointConfig config) {
