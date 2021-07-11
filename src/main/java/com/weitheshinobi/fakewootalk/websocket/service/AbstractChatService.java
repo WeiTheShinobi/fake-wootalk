@@ -16,7 +16,7 @@ public abstract class AbstractChatService {
     protected ChatRoom mChatRoom;
     protected Session anotherUser;
 
-    abstract public void onOpen(String secret, Session session) throws IOException;
+    abstract public void onOpen(Session session) throws IOException;
 
     public void onMessage(String message, Session session) throws IOException {
         boolean isChatRoomFull = mChatRoom.getUserSession1() != null && mChatRoom.getUserSession2() != null;
@@ -29,25 +29,20 @@ public abstract class AbstractChatService {
     }
 
     public void onClose(Session session) throws IOException {
-        if(anotherUser == null){
+        if (anotherUser == null) {
             anotherUser = getAnotherUser(mChatRoom);
-        }
-        if (anotherUser != null) {
-            if(anotherUser.isOpen()) {
-                anotherUser.getBasicRemote().sendText(SYSTEM_MESSAGE_USER_LEFT);
-                anotherUser.close();
-            }
+        } else if (anotherUser.isOpen()) {
+            anotherUser.getBasicRemote().sendText(SYSTEM_MESSAGE_USER_LEFT);
+            anotherUser.close();
         }
     }
 
     public abstract void onError(Session session, Throwable throwable) throws IOException;
 
     protected Session getAnotherUser(ChatRoom chatRoom) {
-        if (chatRoom.getUserSession1() == mSession) {
-            return chatRoom.getUserSession2();
-        } else {
-            return chatRoom.getUserSession1();
-        }
+        return (chatRoom.getUserSession1() == mSession) ?
+                chatRoom.getUserSession2() :
+                chatRoom.getUserSession1();
     }
 
 }

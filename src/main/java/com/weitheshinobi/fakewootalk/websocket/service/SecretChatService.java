@@ -15,17 +15,20 @@ public class SecretChatService extends AbstractChatService {
 
     private String mSecret;
 
-    @Override
-    public void onOpen(String secret, Session session) throws IOException {
-        mSession = session;
-        mSecret = secret;
+    public SecretChatService(String mSecret) {
+        this.mSecret = mSecret;
+    }
 
-        if (chatRoomsMap.get(secret) == null) {
+    @Override
+    public void onOpen(Session session) throws IOException {
+        mSession = session;
+
+        if (chatRoomsMap.get(mSecret) == null) {
             mChatRoom = ChatRoom.getInstance(session);
-            chatRoomsMap.put(secret, mChatRoom);
+            chatRoomsMap.put(mSecret, mChatRoom);
         } else {
-            mChatRoom = chatRoomsMap.get(secret);
-            chatRoomsMap.remove(secret);
+            mChatRoom = chatRoomsMap.get(mSecret);
+            chatRoomsMap.remove(mSecret);
 
             anotherUser = mChatRoom.getUserSession1();
             if (anotherUser.isOpen()) {

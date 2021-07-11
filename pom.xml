@@ -11,7 +11,7 @@
     <groupId>com.weitheshinobi</groupId>
     <artifactId>fake-wootalk</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>fake-wootalk</name>
     <description>Demo project for Spring Boot</description>
     <properties>

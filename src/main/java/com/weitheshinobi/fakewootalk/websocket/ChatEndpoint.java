@@ -20,7 +20,7 @@ public class ChatEndpoint {
     public void onOpen(Session session, EndpointConfig config) throws IOException {
         String secret = getSecretFromHttpSession(config);
         chatService = AbstractChatServiceSimpleFactory.createChatService(secret);
-        chatService.onOpen(secret, session);
+        chatService.onOpen(session);
     }
 
     private String getSecretFromHttpSession(EndpointConfig config) {
