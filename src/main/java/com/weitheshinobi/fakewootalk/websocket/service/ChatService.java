@@ -5,47 +5,46 @@ import com.weitheshinobi.fakewootalk.websocket.pojo.ChatRoom;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
 import java.io.IOException;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
+public abstract class ChatService {
 
-public class ChatService extends AbstractChatService {
+    protected static final String SYSTEM_MESSAGE_USER_LEFT = "系統訊息：對方離開了，請按離開按鈕回到首頁";
+    protected static final String SYSTEM_MESSAGE_START_CHAT = "開始聊天囉！";
+    protected static final String SYSTEM_MESSAGE_SEARCHING = "系統訊息：正在幫您配對中…";
 
-    protected static Queue<ChatRoom> chatRoomsQueue = new ConcurrentLinkedQueue<>();
+    protected Session mSession;
+    protected ChatRoom mChatRoom;
+    protected Session anotherUser;
 
-    @Override
-    public void onOpen(Session session) throws IOException {
-        mSession = session;
+    abstract public void onOpen(Session session) throws IOException;
 
-        if (chatRoomsQueue.size() == 0) {
-            mChatRoom = ChatRoom.getInstance(session);
-            chatRoomsQueue.add(mChatRoom);
+    public void onMessage(String message) throws IOException {
+        boolean isChatRoomFull = mChatRoom.getUserSession1() != null && mChatRoom.getUserSession2() != null;
+        if (isChatRoomFull) {
+            anotherUser = getAnotherUser(mChatRoom);
+            anotherUser.getBasicRemote().sendText(message);
         } else {
-            mChatRoom = chatRoomsQueue.poll();
-            if (mChatRoom.getUserSession1().isOpen()){
-                mChatRoom.setUserSession2(session);
-
-                mChatRoom.getUserSession1().getBasicRemote().sendText(SYSTEM_MESSAGE_START_CHAT);
-                session.getBasicRemote().sendText(SYSTEM_MESSAGE_START_CHAT);
-            } else {
-                session.getBasicRemote().sendText(SYSTEM_MESSAGE_USER_LEFT);
-                session.close();
-            }
+            mSession.getBasicRemote().sendText(SYSTEM_MESSAGE_SEARCHING);
         }
     }
 
-    @Override
-    public void onClose(Session session) throws IOException {
-        super.onClose(session);
-        if (chatRoomsQueue.size() > 0) {
-            ChatRoom chatRoom = chatRoomsQueue.element();
-            if(chatRoom == mChatRoom) chatRoomsQueue.poll();
+    public void onClose() throws IOException {
+        if (anotherUser == null) {
+            anotherUser = getAnotherUser(mChatRoom);
+        } else if (anotherUser.isOpen()) {
+            anotherUser.getBasicRemote().sendText(SYSTEM_MESSAGE_USER_LEFT);
+            anotherUser.close();
         }
     }
 
-    @Override
-    public void onError(Session session, Throwable throwable) throws IOException {
+    public void onError(Session session, Throwable throwable) {
+        throw new UnsupportedOperationException("method onError() not implemented!");
+    }
 
+    protected Session getAnotherUser(ChatRoom chatRoom) {
+        return (chatRoom.getUserSession1() == mSession) ?
+                chatRoom.getUserSession2() :
+                chatRoom.getUserSession1();
     }
 
 }

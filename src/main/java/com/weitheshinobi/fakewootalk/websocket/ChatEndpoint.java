@@ -1,8 +1,8 @@
 package com.weitheshinobi.fakewootalk.websocket;
 
 import com.weitheshinobi.fakewootalk.websocket.config.GetHttpSessionConfigurator;
-import com.weitheshinobi.fakewootalk.websocket.service.AbstractChatServiceSimpleFactory;
-import com.weitheshinobi.fakewootalk.websocket.service.AbstractChatService;
+import com.weitheshinobi.fakewootalk.websocket.service.ChatServiceSimpleFactory;
+import com.weitheshinobi.fakewootalk.websocket.service.ChatService;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpSession;
@@ -14,12 +14,12 @@ import java.io.IOException;
 @Component
 public class ChatEndpoint {
 
-    private AbstractChatService chatService;
+    private ChatService chatService;
 
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) throws IOException {
         String secret = getSecretFromHttpSession(config);
-        chatService = AbstractChatServiceSimpleFactory.createChatService(secret);
+        chatService = ChatServiceSimpleFactory.createChatService(secret);
         chatService.onOpen(session);
     }
 
@@ -32,12 +32,12 @@ public class ChatEndpoint {
 
     @OnMessage
     public void onMessage(String message, Session session) throws IOException {
-        chatService.onMessage(message, session);
+        chatService.onMessage(message);
     }
 
     @OnClose
     public void onClose(Session session) throws IOException {
-        chatService.onClose(session);
+        chatService.onClose();
     }
 
 }

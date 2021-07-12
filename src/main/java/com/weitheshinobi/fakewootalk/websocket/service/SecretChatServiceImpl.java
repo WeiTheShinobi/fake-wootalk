@@ -2,20 +2,19 @@ package com.weitheshinobi.fakewootalk.websocket.service;
 
 import com.weitheshinobi.fakewootalk.websocket.pojo.ChatRoom;
 
-import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class SecretChatService extends AbstractChatService {
+public class SecretChatServiceImpl extends ChatService {
 
     protected static Map<String, ChatRoom> chatRoomsMap = new ConcurrentHashMap<>();
 
     private String mSecret;
 
-    public SecretChatService(String mSecret) {
+    public SecretChatServiceImpl(String mSecret) {
         this.mSecret = mSecret;
     }
 
@@ -44,15 +43,9 @@ public class SecretChatService extends AbstractChatService {
     }
 
     @Override
-    public void onClose(Session session) throws IOException {
-        super.onClose(session);
+    public void onClose() throws IOException {
+        super.onClose();
         if (chatRoomsMap.get(mSecret) == mChatRoom) chatRoomsMap.remove(mSecret);
     }
-
-    @Override
-    public void onError(Session session, Throwable throwable) throws IOException {
-
-    }
-
 
 }
