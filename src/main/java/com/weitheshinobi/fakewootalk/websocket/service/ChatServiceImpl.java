@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ChatServiceImpl extends ChatService {
 
-    protected static Queue<ChatRoom> chatRoomsQueue = new ConcurrentLinkedQueue<>();
+    private static Queue<ChatRoom> chatRoomsQueue = new ConcurrentLinkedQueue<>();
 
     @Override
     public void onOpen(Session session) throws IOException {
