@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SecretChatServiceImpl extends ChatService {
 
-    private static Map<String, ChatRoom> chatRoomsMap = new ConcurrentHashMap<>();
+    private static final Map<String, ChatRoom> chatRoomsMap = new ConcurrentHashMap<>();
 
     private String mSecret;
 

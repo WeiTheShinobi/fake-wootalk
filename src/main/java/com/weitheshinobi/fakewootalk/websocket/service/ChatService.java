@@ -1,8 +1,6 @@
 package com.weitheshinobi.fakewootalk.websocket.service;
 
 import com.weitheshinobi.fakewootalk.websocket.pojo.ChatRoom;
-
-import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
 import java.io.IOException;
 

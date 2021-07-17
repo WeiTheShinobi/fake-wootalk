@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ChatServiceImpl extends ChatService {
 
-    private static Queue<ChatRoom> chatRoomsQueue = new ConcurrentLinkedQueue<>();
+    private static final Queue<ChatRoom> chatRoomsQueue = new ConcurrentLinkedQueue<>();
 
     @Override
     public void onOpen(Session session) throws IOException {
@@ -34,7 +34,7 @@ public class ChatServiceImpl extends ChatService {
         super.onClose();
         if (chatRoomsQueue.size() > 0) {
             ChatRoom chatRoom = chatRoomsQueue.element();
-            if(chatRoom == mChatRoom) chatRoomsQueue.poll();
+            if (chatRoom == mChatRoom) chatRoomsQueue.poll();
         }
     }
 
