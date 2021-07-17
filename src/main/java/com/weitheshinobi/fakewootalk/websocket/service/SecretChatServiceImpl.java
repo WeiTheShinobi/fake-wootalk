@@ -28,17 +28,11 @@ public class SecretChatServiceImpl extends ChatService {
         } else {
             mChatRoom = chatRoomsMap.get(mSecret);
             chatRoomsMap.remove(mSecret);
+            mChatRoom.setUserSession2(session);
 
             anotherUser = mChatRoom.getUserSession1();
-            if (anotherUser.isOpen()) {
-                mChatRoom.getUserSession1().getBasicRemote().sendText(SYSTEM_MESSAGE_START_CHAT);
-                session.getBasicRemote().sendText(SYSTEM_MESSAGE_START_CHAT);
-
-                mChatRoom.setUserSession2(session);
-            } else {
-                session.getBasicRemote().sendText(SYSTEM_MESSAGE_USER_LEFT);
-                session.close();
-            }
+            anotherUser.getBasicRemote().sendText(SYSTEM_MESSAGE_START_CHAT);
+            session.getBasicRemote().sendText(SYSTEM_MESSAGE_START_CHAT);
         }
     }
 

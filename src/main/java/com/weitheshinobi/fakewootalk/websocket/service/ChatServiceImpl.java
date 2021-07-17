@@ -21,15 +21,11 @@ public class ChatServiceImpl extends ChatService {
             chatRoomsQueue.add(mChatRoom);
         } else {
             mChatRoom = chatRoomsQueue.poll();
-            if (mChatRoom.getUserSession1().isOpen()){
-                mChatRoom.setUserSession2(session);
+            mChatRoom.setUserSession2(session);
 
-                mChatRoom.getUserSession1().getBasicRemote().sendText(SYSTEM_MESSAGE_START_CHAT);
-                session.getBasicRemote().sendText(SYSTEM_MESSAGE_START_CHAT);
-            } else {
-                session.getBasicRemote().sendText(SYSTEM_MESSAGE_USER_LEFT);
-                session.close();
-            }
+            anotherUser = mChatRoom.getUserSession1();
+            anotherUser.getBasicRemote().sendText(SYSTEM_MESSAGE_START_CHAT);
+            session.getBasicRemote().sendText(SYSTEM_MESSAGE_START_CHAT);
         }
     }
 

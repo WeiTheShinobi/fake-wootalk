@@ -19,11 +19,12 @@ public abstract class ChatService {
     abstract public void onOpen(Session session) throws IOException;
 
     public void onMessage(String message) throws IOException {
-        boolean isChatRoomFull = mChatRoom.getUserSession1() != null && mChatRoom.getUserSession2() != null;
-        if (isChatRoomFull) {
+        if (mChatRoom.getUserSession2() != null) anotherUser = mChatRoom.getUserSession2();
+
+        if (anotherUser != null) {
             anotherUser = getAnotherUser(mChatRoom);
             anotherUser.getBasicRemote().sendText(message);
-        } else {
+        } else  {
             mSession.getBasicRemote().sendText(SYSTEM_MESSAGE_SEARCHING);
         }
     }
