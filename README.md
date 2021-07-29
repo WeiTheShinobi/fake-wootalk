@@ -9,3 +9,9 @@
 
 [Fake WooTalk Demo - YouTube](https://www.youtube.com/watch?v=Lob2_UPSIK8&ab_channel=ShinobiWei)
 
+## Docker
+
+```shell
+docker pull weitheshinobi/fake-wootalk
+```
+

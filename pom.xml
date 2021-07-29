@@ -54,6 +54,9 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<executable>true</executable>
+                    <image>
+                        <name>weitheshinobi/${project.artifactId}</name>
+                    </image>
 				</configuration>
             </plugin>
         </plugins>
